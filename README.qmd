@@ -1,0 +1,87 @@
+---
+title: "supFTSVD-JM: a joint modeling approach"
+format: gfm
+prefer-html: true
+execute: 
+  warning: false
+  message: false
+bibliography: "inst/references_jm_hdfd_svt.bib"
+---
+
+# Introduction
+
+supFTSVD-JM is a joint modeling framework for high-dimensional longitudinal and time-to-event data with right censoring. It integrates a low-rank tensor decomposition approach, namely, supFTSVD, with Cox proportional hazard model. A maximum likelihood estimation is developed through a penalized Monte Carlo Expectation-Maximization (MCEM) algorithm. The associated *R* package is available at \url{https://github.com/msalam14/supFTSVDJM}. This vignette illustrates implementation of supFTSVD-JM on a simulated data.
+
+-   Call necessary R packages
+
+```{r}
+#| message: false
+#| warning: false
+library(splines)
+library(rstan)
+library(parallel)
+library(foreach)
+library(tdROC)
+library(survival)
+library(supFTSVDJM)
+library(supFTSVD)
+```
+
+-  For installing the *supFTSVDJM* package, the following codes can be used
+
+```{r}
+#| eval: false
+devtools::install_github("https://github.com/msalam14/supFTSVD_JM")
+```
+
+# Simulation study
+
+- We carry out the simulation study using the Duke Cluster Computing (DCC) facilities. The 100 replicates of our Monte Carlo study are submitted as batch jobs. 
+
+- Codes used in the simulation study are available in the directory *SimulationStudy_RCodes*. Two settings investigated are named as *Censoring_25* and *Censoring_40*, representing censoring scenarios $25\%$ and $40\%$, respectively. 
+
+
+- There are three scripts in each censoring directory, namely, *iter_hdld_surv_jm_100.R*, *iter_hdld_surv_jm_200.R*, and *iter_hdld_surv_jm_300.R* for three sample sizes $100$, $200$, and $300$, respectively. 
+
+- For parallel running, we create three hundred scripts from these scripts, 100 copies for each of them. In each censoring directory, the script *create_codes_hdld_jm.R* accomplishes this task. 
+
+- For batch job submission, we used the file named as *sim_jm_hdld.sh*.
+
+- Note that, files *high_dimensional_long_surv_jm.R* and *supFTSVD.R* contain source codes *R* packages *supFTSVDJM* and *supFTSVD*, respectively. One can either source these two files or call the corresponding *R* packages.
+
+
+- For illustration, we obtain results for one Monte Carlo sample of size 50 with feature dimension $100$.
+
+```{r}
+#| eval: false
+#| message: false
+seed_n<-25
+source("SimulationStudy_RCodes/iter_hdld_surv_jm_50.R")
+```
+
+- Each run save three files, *hdld_tr_res_n_seed_n.txt*, *hdld_prd_res_n_seed_n.txt*, and *hdld_cmp_time_n_seed_n.txt*, where $n$ and $seed_n$ will be replaced by the used sample size and seed_n. For example in our demonstration the file names are *hdld_tr_res_50_25.txt*, *hdld_prd_res_50_25.txt*, and *hdld_cmp_time_50_25.txt*. 
+
+- For saving estimation results, we used *hdld_tr_res_50_25.txt*, which has following results
+
+```{r}
+tr_res<-read.table("SimulationStudy_Results/hdld_tr_res_50_25.txt")
+tr_res
+```
+
+- On the other hand, for saving prediction results, we used *hdld_prd_res_50_25.txt*, which has following results
+
+```{r}
+prd_res<-read.table("SimulationStudy_Results/hdld_prd_res_50_25.txt")
+prd_res
+```
+
+- All original results obtained are available in the *SimulationStudy_Results*
+
+# ADNI data analysis:
+
+Due to unavailability of permission, we cannot share the data in this repository. Thus, demonstration on the data is skipped here. However, codes used and results obtained for ADNI data are available in the directories *ADNI_RCodes* and *ADNI_Results*, respectively.
+
+
+
+
+
